@@ -4,67 +4,96 @@
 {% get_current_timezone as TIMEZONE %}
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
-    <head>
-        <meta charset="utf-8" />
-        <title>
-            {% block title %}{% endblock %}
-        | Baby Buddy</title>
-        <link rel="apple-touch-icon"
-              sizes="180x180"
-              href="{% static "babybuddy/root/apple-touch-icon.png" %}?v=20211218" />
-        <link rel="apple-touch-startup-image"
-              href="{% static "babybuddy/root/apple-touch-startup-image.png" %}?v=20211218" />
-        <link rel="icon"
-              type="image/svg+xml"
-              href="{% static "babybuddy/root/favicon.svg" %}?v=20210925" />
-        <link rel="manifest"
-              href="{% static "babybuddy/root/site.webmanifest" %}?v=20211225" />
-        <link rel="mask-icon"
-              href="{% static "babybuddy/root/safari-pinned-tab.svg" %}?v=20211218"
-              color="#37abe9" />
-        <link rel="shortcut icon"
-              href="{% static "babybuddy/root/favicon.ico" %}?v=20211218" />
-        <link rel="stylesheet" href="{% static "babybuddy/css/app.css" %}" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-title" content="Baby Buddy" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-        <meta name="application-name" content="Baby Buddy" />
-        <meta name="mobile-web-app-capable" content="yes">
-        <meta name="msapplication-navbutton-color" content="#37abe9">
-        <meta name="msapplication-starturl" content="/">
-        <meta name="msapplication-TileColor" content="#37abe9" />
-        <meta name="theme-color" content="#37abe9" />
-        <meta name="viewport"
-              content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <!-- kioskboard -->
-        <script src="
-        https://cdn.jsdelivr.net/npm/kioskboard@2.3.0/dist/kioskboard-2.3.0.min.js
-        "></script>
-        <link href="
-        https://cdn.jsdelivr.net/npm/kioskboard@2.3.0/dist/kioskboard-2.3.0.min.css
-        " rel="stylesheet">
 
-    </head>
-    <body>
-        {% block nav %}{% endblock %}
-        {% block breadcrumb_nav %}
-            <nav aria-label="breadcrumb" role="navigation">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href={% url "babybuddy:root-router" %}>{% trans "Home" %}</a>
-                    </li>
-                    {% block breadcrumbs %}{% endblock %}
-                </ol>
-            </nav>
-        {% endblock %}
-        {% block page %}{% endblock %}
-        <script src="{% static "babybuddy/js/vendor.js" %}"></script>
-        <script src="{% static "babybuddy/js/app.js" %}"></script>
-        {% if user.is_authenticated %}<script>BabyBuddy.PullToRefresh.init()</script>{% endif %}
-        {% block javascript %}{% endblock %}
-        <!-- kioskboard -->
-        <script>
-            KioskBoard.run('.js-kioskboard-input', {});
-        </script>
-    </body>
+<head>
+    <meta charset="utf-8" />
+    <title>
+        {% block title %}{% endblock %}
+        | Baby Buddy</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static " babybuddy/root/apple-touch-icon.png"
+        %}?v=20211218" />
+    <link rel="apple-touch-startup-image" href="{% static " babybuddy/root/apple-touch-startup-image.png"
+        %}?v=20211218" />
+    <link rel="icon" type="image/svg+xml" href="{% static " babybuddy/root/favicon.svg" %}?v=20210925" />
+    <link rel="manifest" href="{% static " babybuddy/root/site.webmanifest" %}?v=20211225" />
+    <link rel="mask-icon" href="{% static " babybuddy/root/safari-pinned-tab.svg" %}?v=20211218" color="#37abe9" />
+    <link rel="shortcut icon" href="{% static " babybuddy/root/favicon.ico" %}?v=20211218" />
+    <link rel="stylesheet" href="{% static " babybuddy/css/app.css" %}" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Baby Buddy" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="application-name" content="Baby Buddy" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="msapplication-navbutton-color" content="#37abe9">
+    <meta name="msapplication-starturl" content="/">
+    <meta name="msapplication-TileColor" content="#37abe9" />
+    <meta name="theme-color" content="#37abe9" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <!-- kioskboard -->
+    <script src="https://cdn.jsdelivr.net/npm/kioskboard@2.3.0/dist/kioskboard-2.3.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/kioskboard@2.3.0/dist/kioskboard-2.3.0.min.css" rel="stylesheet">
+    <script type="text/javascript">
+        KioskBoard.init({
+            keysArrayOfObjects: [
+                {
+                    "0": "Q",
+                    "1": "W",
+                    "2": "E",
+                    "3": "R",
+                    "4": "T",
+                    "5": "Y",
+                    "6": "U",
+                    "7": "I",
+                    "8": "O",
+                    "9": "P"
+                },
+                {
+                    "0": "A",
+                    "1": "S",
+                    "2": "D",
+                    "3": "F",
+                    "4": "G",
+                    "5": "H",
+                    "6": "J",
+                    "7": "K",
+                    "8": "L"
+                },
+                {
+                    "0": "Z",
+                    "1": "X",
+                    "2": "C",
+                    "3": "V",
+                    "4": "B",
+                    "5": "N",
+                    "6": "M"
+                }
+            ]
+        });
+    </script>
+</head>
+
+<body>
+    {% block nav %}{% endblock %}
+    {% block breadcrumb_nav %}
+    <nav aria-label="breadcrumb" role="navigation">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href={% url "babybuddy:root-router" %}>{% trans "Home" %}</a>
+            </li>
+            {% block breadcrumbs %}{% endblock %}
+        </ol>
+    </nav>
+    {% endblock %}
+    {% block page %}{% endblock %}
+    <script src="{% static " babybuddy/js/vendor.js" %}"></script>
+    <script src="{% static " babybuddy/js/app.js" %}"></script>
+    {% if user.is_authenticated %}
+    <script>BabyBuddy.PullToRefresh.init()</script>{% endif %}
+    {% block javascript %}{% endblock %}
+    <!-- kioskboard -->
+    <script type="text/javascript">
+        KioskBoard.run('.js-kioskboard-input', {});
+    </script>
+</body>
+
 </html>
