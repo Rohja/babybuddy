@@ -36,6 +36,14 @@
         <meta name="theme-color" content="#37abe9" />
         <meta name="viewport"
               content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <!-- kioskboard -->
+        <script src="
+        https://cdn.jsdelivr.net/npm/kioskboard@2.3.0/dist/kioskboard-2.3.0.min.js
+        "></script>
+        <link href="
+        https://cdn.jsdelivr.net/npm/kioskboard@2.3.0/dist/kioskboard-2.3.0.min.css
+        " rel="stylesheet">
+
     </head>
     <body>
         {% block nav %}{% endblock %}
@@ -54,5 +62,9 @@
         <script src="{% static "babybuddy/js/app.js" %}"></script>
         {% if user.is_authenticated %}<script>BabyBuddy.PullToRefresh.init()</script>{% endif %}
         {% block javascript %}{% endblock %}
+        <!-- kioskboard -->
+        <script>
+            KioskBoard.run('.js-kioskboard-input', {});
+        </script>
     </body>
 </html>
