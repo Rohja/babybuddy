@@ -245,6 +245,103 @@ def card_feeding_last(context, child):
     }
 
 
+@register.inclusion_tag("cards/feeding_history_graph.html", takes_context=True)
+def card_feeding_history_graph(context, child):
+    """
+    Information about the most recent feeding.
+    :param child: an instance of the Child model.
+    :returns: a dictionary with the most recent Feeding instance.
+    """
+    instance = (
+        models.Feeding.objects.filter(child=child)
+        .filter(**_filter_data_age(context))
+        .order_by("-end")
+        .first()
+    )
+    empty = not instance
+
+    ###
+    end_date = timezone.localtime()
+
+    # push end_date to very end of that day
+    # end_date = end_date.replace(hour=23, minute=59, second=59, microsecond=9999)
+    # we need a datetime to use the range helper in the model
+    start_date = end_date - timezone.timedelta(
+        days=8
+    )  # end of the -8th day so we get the FULL 7th day
+
+    instances = (
+        models.Feeding.objects.filter(child=child)
+        .filter(start__range=[start_date, end_date])
+        .order_by("start")
+    )
+
+    # prepare the result list for the last 7 days
+    dates = [end_date - timezone.timedelta(days=i) for i in range(8)]
+    results = [{"date": d, "total": 0, "count": 0} for d in dates]
+
+    graphs = [[] for x in range(7)]
+    for x in range(7):
+        graphs[x] = [0 for y in range(24)]
+
+    # do one pass over the data and add it to the appropriate day
+    for instance in instances:
+        # convert to local tz and push feed_date to end so we're comparing apples to apples for the date
+        feed_date = timezone.localtime(instance.end)
+        #
+        idx = (end_date - feed_date).days
+        result = results[idx]
+        result["total"] += instance.amount if instance.amount is not None else 0
+        result["count"] += 1
+
+        # round feed_date to the nearest 4 hours
+        feed_date = feed_date.replace(minute=0, second=0, microsecond=0)
+        feed_date = feed_date.replace(hour=feed_date.hour)
+        # print("feed_date:", feed_date)
+        # get number of day relative to now
+        # day_offset = (timezone.now() - feed_date).days - 1
+        # print("day_offset:", day_offset)
+
+        # print("idx:", idx - 1)
+
+        graphs[idx - 1][feed_date.hour] += (
+            instance.amount if instance.amount is not None else 0
+        )
+
+    # print(results)
+    for g, graph in enumerate(graphs):
+        new_graph = []
+        prev_amount = 0
+        for i, entry in enumerate(graph):
+            point_start = str(prev_amount / 1000).replace(",", ".")
+            point_end = str((entry + prev_amount) / 1000).replace(",", ".")
+            point_amount = entry + prev_amount
+            new_graph.append((point_start, point_end, point_amount))
+            # print(f"prev_amount[{i}]: {prev_amount}")
+            prev_amount += entry
+            # print(f"new_graph[{i}]: {new_graph}")
+
+        graphs[g] = new_graph
+
+    # points[hour][day]
+    # points = [{} for x in range(6)]  # group by 4 hour blocks
+    # for result in results:
+    #     for i in range(6):
+    #         points[i][result["date"]] = result["graph"][i * 4]
+
+    graphs = list(zip(*reversed(graphs)))
+
+    ###
+
+    return {
+        "type": "feeding",
+        "feeding": results,
+        "graphs": graphs,
+        "empty": empty,
+        "hide_empty": _hide_empty(context),
+    }
+
+
 @register.inclusion_tag("cards/feeding_last_method.html", takes_context=True)
 def card_feeding_last_method(context, child):
     """
