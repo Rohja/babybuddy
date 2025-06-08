@@ -323,8 +323,7 @@ def card_feeding_history_graph(context, child):
 
     return {
         "type": "feeding",
-        "feeding": 1,
-        "graphs": graphs,
+        "feeding": instances,
         "graphs_json": json.dumps(graphs),
         "empty": empty,
         "hide_empty": _hide_empty(context),
