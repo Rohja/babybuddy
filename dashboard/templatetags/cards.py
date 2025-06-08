@@ -279,7 +279,7 @@ def card_feeding_history_graph(context, child):
 
     graphs = {"labels": [f"{i}h" for i in range(24)], "datasets": []}
     colors = [
-        "red",
+        "#37abe9",
         "#FFFFFF",
         "#E0E0E0",
         "#C0C0C0",
