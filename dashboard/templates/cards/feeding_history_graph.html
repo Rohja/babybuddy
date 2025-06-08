@@ -3,33 +3,29 @@
 {% block header %}
     <a href="{% url "core:feeding-list" %}">{% trans "Feeding History" %}</a>
 {% endblock %}
-{% block title %}
-{% endblock %}
+{% block title %}{% endblock %}
 {% block content %}
-{% if feeding %}
-<div id="feeding-history-graph">
-  <canvas id="feeding-history-graph-chart"></canvas>
+    {% if feeding %}
+        <div id="feeding-history-graph">
+            <canvas id="feeding-history-graph-chart"></canvas>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                const ctx = document.getElementById('feeding-history-graph-chart');
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <script>
-    const ctx = document.getElementById('feeding-history-graph-chart');
-
-    new Chart(ctx, {
-      type: 'line',
-      data: {{graphs_json|safe}},
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
-    });
-  </script>
-</div>
-{% else %}
-    {% trans "None" %}
-{% endif %}
+                new Chart(ctx, {
+                  type: 'line',
+                  data: {{graphs_json|safe}},
+                  options: {
+                    scales: {
+                      y: {
+                        beginAtZero: true
+                      }
+                    }
+                  }
+                });
+            </script>
+        </div>
+    {% else %}
+        {% trans "None" %}
+    {% endif %}
 {% endblock %}
-
