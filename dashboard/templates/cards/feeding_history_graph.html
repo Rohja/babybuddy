@@ -8,29 +8,25 @@
 {% block content %}
 {% if feeding %}
 <div id="feeding-history-graph">
-      <table class="charts-css line multiple hide-data show-labels show-secondary-axes">
-        <caption> Line Example #5 </caption>
-        <thead>
-          <tr>
-            <th scope="col"> Day </th>
-            {% for graph in graphs.0 %}
-            <th scope="col">{{ forloop.counter0 }}h</th>
-            {% endfor %}
-          </tr>
-        </thead>
-        <tbody>
-            {% for graph in graphs %}
-            <tr>
-                <th scope="row">{{ forloop.counter0 }}h</th>
-                {% for entry in graph %}
-                <td style="--start: {{ entry.0 }}; --end: {{ entry.1}}; --color: {% cycle 'red' '#C0C0C0' '#A0A0A0' '#808080' '#606060' '#404040' '#202020' %};{% if forloop.counter0 == 0 %} --size: 10px;{% endif %}">
-                    <span class="data"> {{ entry.2 }} </span>
-                </td>
-                {% endfor %}
-            </tr>
-            {% endfor %}
-        </tbody>
-      </table>
+  <canvas id="feeding-history-graph-chart"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    const ctx = document.getElementById('feeding-history-graph-chart');
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {{graphs_json|safe}},
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  </script>
 </div>
 {% else %}
     {% trans "None" %}

@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 
 import collections
+import json
 
 from core import models
 
@@ -264,7 +265,7 @@ def card_feeding_history_graph(context, child):
     end_date = timezone.localtime()
 
     # push end_date to very end of that day
-    # end_date = end_date.replace(hour=23, minute=59, second=59, microsecond=9999)
+    end_date = end_date.replace(hour=23, minute=59, second=59, microsecond=9999)
     # we need a datetime to use the range helper in the model
     start_date = end_date - timezone.timedelta(
         days=8
@@ -276,67 +277,55 @@ def card_feeding_history_graph(context, child):
         .order_by("start")
     )
 
-    # prepare the result list for the last 7 days
-    dates = [end_date - timezone.timedelta(days=i) for i in range(8)]
-    results = [{"date": d, "total": 0, "count": 0} for d in dates]
+    graphs = {"labels": [f"{i}h" for i in range(24)], "datasets": []}
+    colors = [
+        "red",
+        "#FFFFFF",
+        "#E0E0E0",
+        "#C0C0C0",
+        "#A0A0A0",
+        "#808080",
+        "#606060",
+        "#404040",
+        "#202020",
+    ]
+    for i in range(8):
+        day_date = timezone.localtime() - timezone.timedelta(days=i)
+        # Get the day name
+        graphs["datasets"].append(
+            {
+                "label": day_date.strftime("%d/%m"),
+                "data": [0 for _ in range(24)],
+                "borderColor": colors[i],
+            }
+        )
 
-    graphs = [[] for x in range(7)]
-    for x in range(7):
-        graphs[x] = [0 for y in range(24)]
+    # print(instances)
 
     # do one pass over the data and add it to the appropriate day
     for instance in instances:
         # convert to local tz and push feed_date to end so we're comparing apples to apples for the date
         feed_date = timezone.localtime(instance.end)
-        #
-        idx = (end_date - feed_date).days
-        result = results[idx]
-        result["total"] += instance.amount if instance.amount is not None else 0
-        result["count"] += 1
-
-        # round feed_date to the nearest 4 hours
         feed_date = feed_date.replace(minute=0, second=0, microsecond=0)
-        feed_date = feed_date.replace(hour=feed_date.hour)
-        # print("feed_date:", feed_date)
-        # get number of day relative to now
-        # day_offset = (timezone.now() - feed_date).days - 1
-        # print("day_offset:", day_offset)
-
-        # print("idx:", idx - 1)
-
-        graphs[idx - 1][feed_date.hour] += (
+        graphs["datasets"][(end_date - feed_date).days]["data"][feed_date.hour] += (
             instance.amount if instance.amount is not None else 0
         )
 
-    # print(results)
-    for g, graph in enumerate(graphs):
-        new_graph = []
-        prev_amount = 0
-        for i, entry in enumerate(graph):
-            point_start = str(prev_amount / 1000).replace(",", ".")
-            point_end = str((entry + prev_amount) / 1000).replace(",", ".")
-            point_amount = entry + prev_amount
-            new_graph.append((point_start, point_end, point_amount))
-            # print(f"prev_amount[{i}]: {prev_amount}")
-            prev_amount += entry
-            # print(f"new_graph[{i}]: {new_graph}")
+    for dataset in graphs["datasets"]:
+        amount = 0
+        for i, datapoint in enumerate(dataset["data"]):
+            amount += datapoint
+            dataset["data"][i] = amount
 
-        graphs[g] = new_graph
-
-    # points[hour][day]
-    # points = [{} for x in range(6)]  # group by 4 hour blocks
-    # for result in results:
-    #     for i in range(6):
-    #         points[i][result["date"]] = result["graph"][i * 4]
-
-    graphs = list(zip(*reversed(graphs)))
-
-    ###
+    # Truncate current day data to current hour
+    current_hour = timezone.localtime().hour
+    graphs["datasets"][0]["data"] = graphs["datasets"][0]["data"][: current_hour + 1]
 
     return {
         "type": "feeding",
-        "feeding": results,
+        "feeding": 1,
         "graphs": graphs,
+        "graphs_json": json.dumps(graphs),
         "empty": empty,
         "hide_empty": _hide_empty(context),
     }
